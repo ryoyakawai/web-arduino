@@ -23,17 +23,6 @@ void setup()
   //initialize config
   initialize_config();
 
-/*
-  // lcd test
-  i2c_lcd_setup();
-  lcd_setCursor(0, 0);
-  byte a=0x80;
-  char text[80];
-  sprintf(text, "%c", a);
-  lcd_printStr(text);
-  lcd_setCursor(1, 1);
-  lcd_printStr("SCIENCE");
-*/
 }
 
 void initialize_config() {
@@ -61,16 +50,18 @@ void loop()
     if(type==midi::ControlChange && note==0x78) {
       initialize_config();
     }
-
+    
     switch(channel) {
       case 16: // digital pin
         if(type==midi::NoteOff){
           CONFIG_DIGITAL_PIN[note]=type;
           pinMode(note, OUTPUT);
+          VALUE_DIGITAL_PIN[note]=9999;
         }
         if(type==midi::NoteOn) {
           CONFIG_DIGITAL_PIN[note]=type;
           pinMode(note, INPUT);
+          VALUE_DIGITAL_PIN[note]=9999;
         }
         break;
       case 15: // analog pin
@@ -146,4 +137,7 @@ void loop()
 
 }
 
+
+//byte data[] = { 0xF0, 0x43, 0x36, 0x06, 0x21, 0x20, 0x01, 0x22, 0x1B, 0xF7 };
+//sendSysEx(10, data, true);
 

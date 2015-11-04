@@ -5,7 +5,7 @@
     <link rel="import" href="./web-arduino.html">
 
     <web-arduino id="arduino" pinmode='{
-                 "analog":["in", "in", "in", null], 
+                 "analog":["in", "in", null, null], 
                  "digital":[null, null, null, null, null, null, null, null, "in", "in", null, null, null, "out"]}'></web-arduino>
     <br>
     <br>
@@ -38,10 +38,10 @@
         });
 
         ard.setDefAnalogValue("min", 0, 0);
-        ard.setDefAnalogValue("max", 0, 340);
+        ard.setDefAnalogValue("max", 0, 934);
 
         ard.setDefAnalogValue("min", 1, 0);
-        ard.setDefAnalogValue("max", 1, 340);
+        ard.setDefAnalogValue("max", 1, 934);
 
         ard.digitalRead=function(data){
             console.log(data);

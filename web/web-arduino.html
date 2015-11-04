@@ -57,9 +57,12 @@ Polymer({
                         var val="HIGH";
                         if(status==0x82) {
                             val="LOW";
-                    }
-                    this.digitalRead.bind(this)({"pin":pin, "value": val});
-                    break;
+                        }
+                        this.digitalRead.bind(this)({"pin":pin, "value": val});
+                        break;
+                    case 0xf0:
+                        console.log(status);
+                        break;
                 }
                 //console.log(event.detail.data, (event.detail.data[0]).toString(16), event.detail.data[1], event.detail.data[2]);
             });
@@ -106,7 +109,7 @@ Polymer({
             if((this.arduinoReady.input && this.arduinoReady.output)===true) {
                 clearInterval(this.readyTimerId);
                 this.readyTimerId=false;
-                //this.allReset();
+                this.allReset();
                 this.sendAllPinMode.bind(this)();
                 this.midi=this.$.arduino;
                 this.fire("arduino-ready");
@@ -149,6 +152,7 @@ Polymer({
         var type=type.toLowerCase();
         var msb_value=parseInt(value/128);
         var lsb_value=value%128;
+        if(lsb_value==0) lsb_value=0x01; // To avoid "0x9X 0xXX 0x00" changes to "0x8X 0xXX 0x00" 
         pinNo="0x"+pinNo.toString(16);
         switch(type) {
             case "min":
@@ -160,13 +164,15 @@ Polymer({
                 msb_sbyte=0x8d;
                 break;
         }
-        msgs.push([lsb_sbyte, pinNo, 0x00]);
+        msgs.push([lsb_sbyte, pinNo, 0x01]);
         msgs.push([msb_sbyte, pinNo, 0x00]);
         msgs.push([lsb_sbyte, pinNo, lsb_value]);
         msgs.push([msb_sbyte, pinNo, msb_value]);
+        console.log(type, msb_value*128+lsb_value, msb_sbyte.toString(16), msb_value, lsb_sbyte.toString(16), lsb_value);
         for(var i=0; i<msgs.length; i++) {
-            this.delay(20);
-           this.$.arduinoout.sendRawMessage(msgs[i]);
+            this.delay(10);
+            this.$.arduinoout.sendRawMessage(msgs[i]);
+            this.delay(10);
         }
     },
     digitalWrite: function(pinNo, val) {

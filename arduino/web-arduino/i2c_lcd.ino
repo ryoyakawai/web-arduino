@@ -1,3 +1,17 @@
+/*
+  // lcd test
+  i2c_lcd_setup();
+  lcd_setCursor(0, 0);
+  byte a=0x80;
+  char text[80];
+  sprintf(text, "%c", a);
+  lcd_printStr(text);
+  lcd_setCursor(1, 1);
+  lcd_printStr("SCIENCE");
+*/
+
+
+/*
 #include <Wire.h>
 
 #define vddPin 16    // ArduinoA2
@@ -71,4 +85,4 @@ void lcd_setContrast(byte c) {
 void lcd_setCursor(byte x, byte y) {
   lcd_cmd(0x80 | (y * 0x40 + x));
 }
-
+*/
