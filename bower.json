@@ -1,0 +1,22 @@
+{
+  "name": "web-arduino",
+  "version": "0.0.1",
+  "authors": [
+    "Ryoya Kawai"
+  ],
+  "description": "Control Arduimo from Web Browser",
+  "license": "Apache2",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "polymer": "Polymer/polymer#^1.0.0"
+  },
+  "devDependencies": {
+    "x-webmidi": "~0.10.23"
+  }
+}

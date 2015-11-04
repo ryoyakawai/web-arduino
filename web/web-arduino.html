@@ -1,0 +1,209 @@
+<!-- web-arduino.html (2015) -->
+<!--
+Copyright 2015 Ryoya Kawai. All rights reserved.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+<link rel="import" href="./bower_components/x-webmidi/x-webmidirequestaccess.html">
+<link rel="import" href="./bower_components/x-webmidi/extras/wm-pckeyboard/wm-pckeyboard.html">
+<link rel="import" href="./bower_components/x-webmidi/extras/wm-webmidilink/wm-webmidilink.html">
+
+<dom-module id="web-arduino">
+  <template>
+    <x-webmidirequestaccess id="arduino" input output></x-webmidirequestaccess>
+    <x-webmidiinput id="arduinoin" autoselect="^MIDI/MOCO for LUFA||MIDI/MOCO"></x-webmidiinput>
+    <x-webmidioutput id="arduinoout" autoselect="^MIDI/MOCO for LUFA||MIDI/MOCO"></x-webmidioutput>
+  </template>
+</dom-module>
+<script type="text/javascript">
+Polymer({
+    is: "web-arduino",
+    properties: {
+        pinmode: {
+            type: String,
+            value: null
+        }
+    },
+    ready: function() {
+        this.componentsReady=false;
+        this.arduinoReady={"input": false, "output": false};
+
+        window.addEventListener("midiin-autoselected:arduinoin", function(event){
+            this.arduinoReady.input=true;
+            this.addEventListener("midiin-event:arduinoin", function(event){
+                var status=event.detail.data[0];
+                switch(status) {
+                    case 0x90:
+                    case 0x80:
+                        // analog
+                        var pin=event.detail.data[1];
+                        var val=event.detail.data[2];
+                        this.analogRead.bind(this)({"pin":pin, "value": val});
+                        break;
+                    case 0x92:
+                    case 0x82:
+                        // digital
+                        var pin=event.detail.data[1];
+                        var val="HIGH";
+                        if(status==0x82) {
+                            val="LOW";
+                    }
+                    this.digitalRead.bind(this)({"pin":pin, "value": val});
+                    break;
+                }
+                //console.log(event.detail.data, (event.detail.data[0]).toString(16), event.detail.data[1], event.detail.data[2]);
+            });
+        }.bind(this));
+        window.addEventListener("midiout-autoselected:arduinoout", function(event){
+            this.arduinoReady.output=true;
+        }.bind(this));
+
+        this.pinmode=JSON.parse(this.pinmode);
+
+        // disconnected
+        window.addEventListener("x-webmidi:output-updated", function(event){
+            if(event.detail.port.state=="disconnected" &&
+               event.detail.port.name.match(new RegExp(this.$["arduinoout"]).autoselect)) {
+                this.arduinoReady.output=false;
+                if((this.arduinoReady.input && this.arduinoReady.output)===false &&
+                   this.readyTimerId===false) {
+                    this.waitingForConnection.bind(this)();
+                }
+            }
+        }.bind(this));
+        window.addEventListener("x-webmidi:input-updated", function(event){
+            if(event.detail.port.state=="disconnected" &&
+               event.detail.port.name.match(new RegExp(this.$["arduinoout"]).autoselect)) {
+                this.arduinoReady.input=false;
+                if((this.arduinoReady.input && this.arduinoReady.output)===false &&
+                   this.readyTimerId===false) {
+                    this.waitingForConnection.bind(this)();
+                }
+            }
+        }.bind(this));
+        console.info(this.pinmode, this.arduinoReady);
+    },
+    attached: function() {
+        // used be a domReady
+        this.readyTimerId=false;
+        this.async(function() {
+            console.info("[webcomponents ready] ", this, this.arduinoReady);
+            this.waitingForConnection.bind(this)();
+        }.bind(this));
+    },
+    waitingForConnection: function() {
+        this.readyTimerId=setInterval(function(event){
+            if((this.arduinoReady.input && this.arduinoReady.output)===true) {
+                clearInterval(this.readyTimerId);
+                this.readyTimerId=false;
+                //this.allReset();
+                this.sendAllPinMode.bind(this)();
+                this.midi=this.$.arduino;
+                this.fire("arduino-ready");
+            }
+        }.bind(this), 100);
+    },
+    sendAllPinMode: function() {
+        var ch;
+        for(var key in this.pinmode) {
+            for(var i=0; i<this.pinmode[key].length; i++) {
+                if(this.pinmode[key][i]!=null &&
+                   this.pinmode[key][i].toLowerCase().match(/in|out/)) {
+                    this.delay(20);
+                    this.pinMode(key, i, this.pinmode[key][i].toLowerCase());
+                }
+            }
+        }
+        console.info("[sent configuration]");
+    },
+    // type:["analog" or "digital"]
+    // direction: ["in" or "out"]
+    pinMode: function(type, pinNo, direction) {
+        var msg=[], sb=0x00;
+        if(direction=="out") {
+            if(type=="analog") sb=0x8e;
+            if(type=="digital") sb=0x8f;
+        } else 
+        if(direction=="in") {
+            if(type=="analog") sb=0x9e;
+            if(type=="digital") sb=0x9f;
+        }
+        msg=[sb, pinNo, 0x01];
+        this.$.arduinoout.sendRawMessage(msg);
+        console.log(key, msg[0].toString(16), msg[1], msg[2]);
+    },
+    // type:["min" or "max"]
+    setDefAnalogValue: function(type, pinNo, value) {
+        var lsb_sbyte, msb_sbyte;
+        var msgs=[];
+        var type=type.toLowerCase();
+        var msb_value=parseInt(value/128);
+        var lsb_value=value%128;
+        pinNo="0x"+pinNo.toString(16);
+        switch(type) {
+            case "min":
+                lsb_sbyte=0x9c;
+                msb_sbyte=0x8c;
+                break;
+            case "max":
+                lsb_sbyte=0x9d;
+                msb_sbyte=0x8d;
+                break;
+        }
+        msgs.push([lsb_sbyte, pinNo, 0x00]);
+        msgs.push([msb_sbyte, pinNo, 0x00]);
+        msgs.push([lsb_sbyte, pinNo, lsb_value]);
+        msgs.push([msb_sbyte, pinNo, msb_value]);
+        for(var i=0; i<msgs.length; i++) {
+            this.delay(20);
+           this.$.arduinoout.sendRawMessage(msgs[i]);
+        }
+    },
+    digitalWrite: function(pinNo, val) {
+        var sbyte, velocity;
+        if(val=="HIGH") {
+            sbyte=0x92;
+            velocity=0x7f;
+        } else 
+        if(val=="LOW") {
+            sbyte=0x82;
+            velocity=0x00;
+        }
+        //console.log(sbyte.toString(16), pinNo);
+        this.$.arduinoout.sendRawMessage([sbyte, "0x"+pinNo.toString(16), "0x"+velocity.toString(16)]);
+    },
+    digitalRead: function(data) {
+        console.info("Callback for digital input is not set.\n[Digital] ", data);
+    },
+    analogRead: function(data) {
+        console.info("Callback for analog input is not set.\n[Analog] ", data[0].toString(16), data[1], data[2]);
+    },
+    allReset: function() {
+        this.delay(1000);
+        var msg=[0x00, 0x78, 0x00];
+        for(var i=1; i<16; i++) {
+            msg[0]="0xb"+i.toString(16);
+            this.$.arduinoout.sendRawMessage(msg);
+        }
+        this.delay(1000);
+        console.info("[Reset All Configuration]");
+    },
+    delay: function(msec) {
+        var now=performance.now();
+        var expire=performance.now()+msec;
+        while(expire > now) {
+            now=performance.now();
+        }
+    }
+});
+</script>

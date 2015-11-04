@@ -1,0 +1,60 @@
+<html>
+  <head></head>
+  <body>
+    <link rel="import" href="./bower_components/x-webmidi/x-webmidirequestaccess.html">
+    <link rel="import" href="./web-arduino.html">
+
+    <web-arduino id="arduino" pinmode='{
+                 "analog":["in", "in", "in", null], 
+                 "digital":[null, null, null, null, null, null, null, null, "in", "in", null, null, null, "out"]}'></web-arduino>
+    <br>
+    <br>
+
+    <button id="b13" class="off">Pin 13 ON</button><br>
+    <br>
+
+    <div>Digital Pin 8 for Output: <span id="dIn8">-</span></div>
+    <div>Digital Pin 9 for Output: <span id="dIn9">-</span></div>
+    <br>
+
+    <div>Analog Pin 0 for Output: <span id="aIn0">-</span></div>
+    <div>analog Pin 1 for Output: <span id="aIn1">-</span></div>
+    <script>
+    var ard=document.getElementById("arduino");
+    ard.addEventListener("arduino-ready", function(event){
+        console.info("[arduino-ready]");
+
+        document.getElementById("b13").addEventListener("mousedown", function(event){
+            var state="LOW";
+            if(event.target.className=="off") {
+                state="HIGH";
+                event.target.className="on";
+                event.target.innerHTML="Pin 13 OFF";
+            } else {
+                event.target.className="off";
+                event.target.innerHTML="Pin 13 ON";
+            }
+            ard.digitalWrite(13, state);
+        });
+
+        ard.setDefAnalogValue("min", 0, 0);
+        ard.setDefAnalogValue("max", 0, 340);
+
+        ard.setDefAnalogValue("min", 1, 0);
+        ard.setDefAnalogValue("max", 1, 340);
+
+        ard.digitalRead=function(data){
+            console.log(data);
+            document.getElementById("dIn"+data.pin).innerHTML=data.value;
+        };
+        ard.analogRead=function(data){
+            console.log(data);
+            document.getElementById("aIn"+data.pin).innerHTML=data.value;
+        };
+
+
+    });
+    </script>
+
+  </body>
+</html>
