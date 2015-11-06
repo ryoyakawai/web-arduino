@@ -42,7 +42,6 @@ Polymer({
         this.componentsReady=false;
         this.arduinoReady={"input": false, "output": false};
 
-        this.undesolved("add");
         window.addEventListener("midiin-autoselected:arduinoin", function(event){
             this.arduinoReady.input=true;
             this.addEventListener("midiin-event:arduinoin", function(event){
@@ -111,6 +110,7 @@ Polymer({
         }.bind(this));
     },
     waitingForConnection: function() {
+        this.undesolved("add");
         this.readyTimerId=setInterval(function(event){
             if((this.arduinoReady.input && this.arduinoReady.output)===true) {
                 clearInterval(this.readyTimerId);

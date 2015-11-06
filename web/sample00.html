@@ -52,6 +52,11 @@
         };
         ard.analogRead=function(data){
             document.getElementById("aIn"+data.pin).innerHTML=data.value;
+            var state="LOW";
+            if(data.pin==1 && data.value>64) {
+                state="HIGH";
+            }
+            ard.digitalWrite(13, state);
         };
 
 
