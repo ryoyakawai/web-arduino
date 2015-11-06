@@ -1,5 +1,9 @@
 <html>
-  <head></head>
+  <head>
+    <title>sample00 - Web-Arduino</title>
+    <!--link rel="stylesheet" type="text/css" href="./css/main.css"-->
+
+  </head>
   <body>
     <link rel="import" href="./bower_components/x-webmidi/x-webmidirequestaccess.html">
     <link rel="import" href="./web-arduino.html">
@@ -41,14 +45,12 @@
         ard.setDefAnalogValue("max", 0, 934);
 
         ard.setDefAnalogValue("min", 1, 0);
-        ard.setDefAnalogValue("max", 1, 934);
+        ard.setDefAnalogValue("max", 1, 930);
 
         ard.digitalRead=function(data){
-            console.log(data);
             document.getElementById("dIn"+data.pin).innerHTML=data.value;
         };
         ard.analogRead=function(data){
-            console.log(data);
             document.getElementById("aIn"+data.pin).innerHTML=data.value;
         };
 
