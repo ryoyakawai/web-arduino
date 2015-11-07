@@ -49,58 +49,62 @@ void loop()
 
     if(type==midi::ControlChange && note==0x78) {
       initialize_config();
-    }
-    
-    switch(channel) {
-      case 16: // digital pin
-        if(type==midi::NoteOff){
-          CONFIG_DIGITAL_PIN[note]=type;
-          pinMode(note, OUTPUT);
-          VALUE_DIGITAL_PIN[note]=9999;
-        }
-        if(type==midi::NoteOn) {
-          CONFIG_DIGITAL_PIN[note]=type;
-          pinMode(note, INPUT);
-          VALUE_DIGITAL_PIN[note]=9999;
-        }
-        break;
-      case 15: // analog pin
-        // for analog
-        if(type==midi::NoteOff){
-          CONFIG_ANALOG_PIN[note]=type;
-          //pinMode(note, OUTPUT);
-        }
-        if(type==midi::NoteOn) {
-          CONFIG_ANALOG_PIN[note]=type;
-          //pinMode(note, INPUT);
-        }
-        break; 
-      case 14: // analog config value MAX 
-        if(type==midi::NoteOff){
-          CONFIG_ANALOG_VAL_MAX[note]+=velocity*128;
-        }
-        if(type==midi::NoteOn) {
-          CONFIG_ANALOG_VAL_MAX[note]+=velocity;
-        }
-        break; 
-      case 13: // analog config value MIX 
-        if(type==midi::NoteOff){
-          CONFIG_ANALOG_VAL_MIN[note]+=velocity*128;
-        }
-        if(type==midi::NoteOn) {
-          CONFIG_ANALOG_VAL_MIN[note]+=velocity;
-        }
-        break; 
-      case 3:
-        if (type==midi::NoteOff) {
-          digitalWrite(note, LOW);
-        }
-        if (type==midi::NoteOn) {
-          digitalWrite(note, HIGH);
-        }
-        break;
-      default:
-        break;
+    } else
+    //if(type==midi::ActiveSensing) {
+      // do nothing
+    //} else
+    {
+      switch(channel) {
+        case 16: // digital pin
+          if(type==midi::NoteOff){
+            CONFIG_DIGITAL_PIN[note]=type;
+            pinMode(note, OUTPUT);
+            VALUE_DIGITAL_PIN[note]=9999;
+          }
+          if(type==midi::NoteOn) {
+            CONFIG_DIGITAL_PIN[note]=type;
+            pinMode(note, INPUT);
+            VALUE_DIGITAL_PIN[note]=9999;
+          }
+          break;
+        case 15: // analog pin
+          // for analog
+          if(type==midi::NoteOff){
+            CONFIG_ANALOG_PIN[note]=type;
+            //pinMode(note, OUTPUT);
+          }
+          if(type==midi::NoteOn) {
+            CONFIG_ANALOG_PIN[note]=type;
+            //pinMode(note, INPUT);
+          }
+          break; 
+        case 14: // analog config value MAX 
+          if(type==midi::NoteOff){
+            CONFIG_ANALOG_VAL_MAX[note]+=velocity*128;
+          }
+          if(type==midi::NoteOn) {
+            CONFIG_ANALOG_VAL_MAX[note]+=velocity;
+          }
+          break; 
+        case 13: // analog config value MIX 
+          if(type==midi::NoteOff){
+            CONFIG_ANALOG_VAL_MIN[note]+=velocity*128;
+          }
+          if(type==midi::NoteOn) {
+            CONFIG_ANALOG_VAL_MIN[note]+=velocity;
+          }
+          break; 
+        case 3:
+          if (type==midi::NoteOff) {
+            digitalWrite(note, LOW);
+          } 
+          if (type==midi::NoteOn) {
+            digitalWrite(note, HIGH);
+          }
+          break;
+        default:
+          break;
+      }
     }
   }
 

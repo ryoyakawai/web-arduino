@@ -21,8 +21,8 @@ limitations under the License.
 <dom-module id="web-arduino">
   <template>
     <x-webmidirequestaccess id="arduino" input output></x-webmidirequestaccess>
-    <x-webmidiinput id="arduinoin" autoselect="^MIDI/MOCO for LUFA||MIDI/MOCO"></x-webmidiinput>
-    <x-webmidioutput id="arduinoout" autoselect="^MIDI/MOCO for LUFA||MIDI/MOCO"></x-webmidioutput>
+    <x-webmidiinput id="arduinoin" autoselect="^MIDI/MOCO for LUFA||MIDI/MOCO||UX-16||mi.1"></x-webmidiinput>
+    <x-webmidioutput id="arduinoout" autoselect="^MIDI/MOCO for LUFA||MIDI/MOCO||UX-16||mi.1"></x-webmidioutput>
   </template>
 </dom-module>
 <script type="text/javascript">
@@ -84,7 +84,7 @@ Polymer({
                 this.arduinoReady.output=false;
                 if((this.arduinoReady.input && this.arduinoReady.output)===false &&
                    this.readyTimerId===false) {
-                    this.waitingForConnection.bind(this)();
+                    this.waitingForConnection.bind(this)("reconnect");
                 }
             }
         }.bind(this));
@@ -94,7 +94,7 @@ Polymer({
                 this.arduinoReady.input=false;
                 if((this.arduinoReady.input && this.arduinoReady.output)===false &&
                    this.readyTimerId===false) {
-                    this.waitingForConnection.bind(this)();
+                    this.waitingForConnection.bind(this)("reconnect");
                 }
             }
         }.bind(this));
@@ -105,11 +105,10 @@ Polymer({
         this.readyTimerId=false;
         this.async(function() {
             console.info("[webcomponents ready] ");
-//            console.info("[webcomponents ready] ", this, this.arduinoReady);
-            this.waitingForConnection.bind(this)();
+            this.waitingForConnection.bind(this)("init");
         }.bind(this));
     },
-    waitingForConnection: function() {
+    waitingForConnection: function(type) {
         this.undesolved("add");
         this.readyTimerId=setInterval(function(event){
             if((this.arduinoReady.input && this.arduinoReady.output)===true) {
@@ -118,13 +117,15 @@ Polymer({
                 var result=this.allReset();
                 this.sendAllPinMode.bind(this)();
                 this.midi=this.$.arduino;
-                this.fire("arduino-ready");
+                var data={"init":false};
+                if(type=="init")  data.init=true;
+                this.fire("arduino-ready", data);
                 this.undesolved("remove");
             }
         }.bind(this), 100);
     },
     undesolved: function(type) {
-        var elemId="fr";
+        var elemId="fr", elemId_urimage="urimage";
         switch(type.toLowerCase()) {
             case "add":                
                 var fr=document.createElement("div");
@@ -148,6 +149,7 @@ Polymer({
                 op.style.setProperty("z-index", "1");
 
                 var imgDiv=document.createElement("div");
+                imgDiv.id=elemId_urimage;
                 imgDiv.style.setProperty("position", "absolute");
                 imgDiv.style.setProperty("top", parseInt(window.innerHeight/4)+"px");
                 imgDiv.style.setProperty("z-index", "2")
@@ -172,6 +174,9 @@ Polymer({
                     }, 1000);
                 }, 1000);
                 break;
+        }
+        window.onresize=function(event) {
+            document.getElementById(elemId_urimage).style.setProperty("top", parseInt(window.innerHeight/4)+"px");
         }
     },
     sendAllPinMode: function() {
