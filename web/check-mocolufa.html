@@ -1,0 +1,73 @@
+<html>
+  <head>
+    <title>Check Moco for LUFA connection - Arduino with Moco for LUFA</title>
+    <style type="text/css">
+    h2, h3{
+      text-align:center;
+      font-family:arial;
+    }
+    h3 {
+      color:#777777;
+    }
+    .frame {
+      width:500px;
+      padding:10px;
+      border-radius:5px;
+      background-color:#efefef;
+      margin:30px auto;
+    }
+    .container {
+      height:200px;
+    }
+    .indicator {
+      width:100px;
+      height:100px;
+      border-radius:50%;
+      transition:0.5s;
+      margin:50px auto;
+    }
+    .bgcolor-red {
+      background-color:#f44336;
+      opacity:0.15;
+    }
+    .bgcolor-green {
+      background-color:#0f9d58;
+    }
+    </style>
+  </head>
+  <body>
+    <link rel="import" href="./bower_components/x-webmidi/x-webmidirequestaccess.html">
+    <link rel="import" href="./web-arduino.html">
+
+    <div class="frame">
+      <h2>Moco for LUFA connection Test</h2>
+      <web-arduino id="arduino" hidden></web-arduino>
+      <div class="container">
+        <div id="status-ml" class="indicator bgcolor-red"></div>
+        <h3 id="status-text">(´・ω・｀)ｼｮﾎﾞｰﾝ</h3>
+      </div>
+    </div>
+
+    <script>
+    var ard=document.getElementById("arduino");
+    var indicator=document.getElementById("status-ml");
+    var st=document.getElementById("status-text");
+    ard.addEventListener("arduino-ready", function(event){
+        console.info("[arduino-ready]");
+
+        this.addEventListener("WebArduinoReady", function(event){
+            indicator.className="indicator";
+            indicator.className+=" bgcolor-green";
+            st.innerHTML="Moco for LUFA is Connected!";
+        });
+        this.addEventListener("WebArduinoStandby", function(event){
+            indicator.className="indicator";
+            indicator.className+=" bgcolor-red";
+            st.innerHTML="(´・ω・｀)ｼｮﾎﾞｰﾝ";
+        });
+
+    });
+    </script>
+
+  </body>
+</html>
