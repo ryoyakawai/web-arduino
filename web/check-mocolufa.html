@@ -4,11 +4,13 @@
     <meta charset="UTF-8">
     <title>Check Moco for LUFA connection - Arduino with Moco for LUFA</title>
     <style type="text/css">
-    h2, h3{
+    h2 {
       text-align:center;
       font-family:arial;
     }
     h3 {
+      text-align:center;
+      font-family:arial;
       color:#777777;
     }
     .frame {
@@ -56,18 +58,16 @@
     var st=document.getElementById("status-text");
     ard.addEventListener("arduino-ready", function(event){
         console.info("[arduino-ready]");
-
-        this.addEventListener("WebArduinoReady", function(event){
-            indicator.className="indicator";
-            indicator.className+=" bgcolor-green";
-            st.innerHTML="Moco for LUFA is Connected!";
-        });
-        this.addEventListener("WebArduinoStandby", function(event){
-            indicator.className="indicator";
-            indicator.className+=" bgcolor-red";
-            st.innerHTML="(´・ω・｀)ｼｮﾎﾞｰﾝ";
-        });
-
+    });
+    ard.addEventListener("WebArduinoReady", function(event){
+        indicator.className="indicator";
+        indicator.className+=" bgcolor-green";
+        st.innerHTML="Moco for LUFA is Connected!";
+    });
+    ard.addEventListener("WebArduinoStandby", function(event){
+        indicator.className="indicator";
+        indicator.className+=" bgcolor-red";
+        st.innerHTML="(´・ω・｀)ｼｮﾎﾞｰﾝ";
     });
     </script>
 
