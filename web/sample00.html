@@ -1,7 +1,6 @@
 <html>
   <head>
     <title>sample00 - Web-Arduino</title>
-    <!--link rel="stylesheet" type="text/css" href="./css/main.css"-->
     <style type="text/css">
     .aval {
       display:inline-block; 
@@ -44,9 +43,11 @@
     <link rel="import" href="./bower_components/x-webmidi/x-webmidirequestaccess.html">
     <link rel="import" href="./web-arduino.html">
 
-    <web-arduino id="arduino" pinmode='{
-                 "analog":["in", "in", "in", "in"], 
-                 "digital":[null, null, null, null, null, null, null, null, "in", "in", null, null, null, "out"]}'></web-arduino>
+    <web-arduino id="arduino" 
+                 pinmode='{
+                   "analog":[ "in", "in",  "in", "in"], 
+                   "digital":[null, null, null, null, null, null, null, null, "in", "in", null, null, null, "out"]
+                 }'></web-arduino>
     <br>
     <br>
 
@@ -59,6 +60,8 @@
 
     <div>Analog Pin 0 for Output: <div id="aIn0" class="aval">-</div> <div id="aIn0s" class="statusbar bgcolor-blue"></div></div>
     <div>Analog Pin 1 for Output: <div id="aIn1" class="aval">-</div> <div id="aIn1s" class="statusbar bgcolor-green"></div></div>
+<!--
+-->
     <div>Analog Pin 2 for Output: <div id="aIn2" class="aval">-</div> <div id="aIn2s" class="statusbar bgcolor-red"></div></div>
     <div>Analog Pin 3 for Output: <div id="aIn3" class="aval">-</div> <div id="aIn3s" class="statusbar bgcolor-orange"></div></div>
     <script>
