@@ -60,11 +60,13 @@
         console.info("[arduino-ready]");
     });
     ard.addEventListener("WebArduinoReady", function(event){
+        console.info("[WebArduinoReady]");
         indicator.className="indicator";
         indicator.className+=" bgcolor-green";
         st.innerHTML="Moco for LUFA is Connected!";
     });
     ard.addEventListener("WebArduinoStandby", function(event){
+        console.info("[WebArduinoStandby]");
         indicator.className="indicator";
         indicator.className+=" bgcolor-red";
         st.innerHTML="(´・ω・｀)ｼｮﾎﾞｰﾝ";
