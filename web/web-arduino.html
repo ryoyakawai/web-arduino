@@ -50,7 +50,7 @@ Polymer({
         
         if(this.disable===true) this.$.arduinoin.setProperty("hidden", "hidden");
 
-        var autoSelectDeviceName="^MIDI/MOCO for LUFA$|^MIDI/MOCO";
+        var autoSelectDeviceName="^MIDI/MOCO for LUFA$|^MocoLUFA$";
         if(this.boardname!=null && this.boardname!="") {
             autoSelectDeviceName=this.boardname+"|"+autoSelectDeviceName;
         }
@@ -190,7 +190,7 @@ Polymer({
                 fr.appendChild(imgDiv);
                 fr.appendChild(op);
 
-                document.body.appendChild(fr);
+                //document.body.appendChild(fr);
                 break;
             case "remove":
                 var rNode=document.getElementById(elemId);
