@@ -48,7 +48,7 @@
       <web-arduino id="arduino" hidden></web-arduino>
       <div class="container">
         <div id="status-ml" class="indicator bgcolor-red"></div>
-        <h3 id="status-text">(´・ω・｀)ｼｮﾎﾞｰﾝ</h3>
+        <h3 id="status-text"></h3>
       </div>
     </div>
 
@@ -56,20 +56,20 @@
     var ard=document.getElementById("arduino");
     var indicator=document.getElementById("status-ml");
     var st=document.getElementById("status-text");
+    var disconnetedMsg="Moco for LUFA is NOT connected....";
+    st.innerHTML=disconnetedMsg;
     ard.addEventListener("arduino-ready", function(event){
         console.info("[arduino-ready]");
     });
     ard.addEventListener("WebArduinoReady", function(event){
-        console.info("[WebArduinoReady]");
         indicator.className="indicator";
         indicator.className+=" bgcolor-green";
-        st.innerHTML="Moco for LUFA is Connected!";
+        st.innerHTML="(｀・ω・´)ｼｬｷｰﾝ";
     });
     ard.addEventListener("WebArduinoStandby", function(event){
-        console.info("[WebArduinoStandby]");
         indicator.className="indicator";
         indicator.className+=" bgcolor-red";
-        st.innerHTML="(´・ω・｀)ｼｮﾎﾞｰﾝ";
+        st.innerHTML=disconnetedMsg;
     });
     </script>
 
