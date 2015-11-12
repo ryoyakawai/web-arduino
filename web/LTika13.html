@@ -1,0 +1,87 @@
+<html>
+  <head>
+    <title>sample00 - Web-Arduino</title>
+    <style type="text/css">
+    .aval {
+      display:inline-block; 
+      text-align:right;
+      width:27px;
+    }
+    .indicator {
+      display:inline-block; 
+      width:10px; 
+      height:10px;
+      border-radius:50%;
+    }
+    .statusbar {
+      display:inline-block; 
+      width:0px; 
+      height:10px;
+    }
+    .bgcolor-blue {
+      background-color:#03a9f4;
+      opacity:1;
+    }
+    .bgcolor-green {
+      background-color:#0f9d58;
+      opacity:1;
+    }
+    .bgcolor-orange {
+      background-color:#ff9800;
+      opacity:1;
+    }
+    .bgcolor-red {
+      background-color:#f44336;
+      opacity:1;
+    }
+    .off-color {
+      opacity:0.15;
+    }
+    </style>
+  </head>
+  <body>
+    <link rel="import" href="./bower_components/x-webmidi/x-webmidirequestaccess.html">
+    <link rel="import" href="./web-arduino.html">
+
+    <web-arduino id="arduino" 
+                 pinmode='{
+                   "analog":[ null, null,  null, null], 
+                   "digital":[null, null, null, null, null, null, null, null, null, null, null, null, null, "out"]
+                 }'></web-arduino>
+    <br>
+    <br>
+
+    <button id="b13" class="off">Pin 13 ON</button><br>
+    <br>
+
+    <script>
+    var ard=document.getElementById("arduino");
+    ard.addEventListener("arduino-ready", function(event){
+        console.info("[arduino-ready]");
+
+        // configuration
+
+        // event handlers
+        if(event.detail.init==true) {
+            document.getElementById("b13").addEventListener("mousedown", function(event){
+                var state="LOW";
+                if(event.target.className=="off") {
+                    state="HIGH";
+                    event.target.className="on";
+                    event.target.innerHTML="Pin 13 OFF";
+                } else {
+                    event.target.className="off";
+                    event.target.innerHTML="Pin 13 ON";
+                }
+                ard.digitalWrite(13, state);
+            });
+
+            ard.digitalRead=function(){};
+            ard.analogRead=function(){};
+        }
+
+    });
+    </script>
+
+  </body>
+</html>
