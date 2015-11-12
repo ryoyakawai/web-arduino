@@ -225,6 +225,7 @@ Polymer({
     // direction: ["in" or "out"]
     pinMode: function(type, pinNo, direction) {
         var msg=[], sb=0x00;
+        this.pinmode[type][pinNo]=direction;
         if(direction=="out") {
             if(type=="analog") sb=0x8e;
             if(type=="digital") sb=0x8f;
@@ -233,9 +234,10 @@ Polymer({
             if(type=="analog") sb=0x9e;
             if(type=="digital") sb=0x9f;
         }
-        msg=[sb, pinNo, 0x01];
-        this.$.arduinoout.sendRawMessage(msg);
-        //console.log(key, msg[0].toString(16), msg[1], msg[2]);
+        if(sb!=0x00) {
+            msg=[sb, pinNo, 0x01];
+            this.$.arduinoout.sendRawMessage(msg);
+        }
     },
     // type:["min" or "max"]
     setDefAnalogValue: function(type, pinNo, value) {

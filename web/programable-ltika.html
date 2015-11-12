@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>Check Moco for LUFA connection - Arduino with Moco for LUFA</title>
+    <style type="text/css">
+    body {
+      font-family:arial;
+    }
+    h2 {
+      text-align:center;
+    }
+    h3 {
+      text-align:center;
+      font-family:arial;
+      color:#777777;
+    }
+    .frame {
+      width:480px;
+      height:500px;
+      padding:20px;
+      border-radius:5px;
+      background-color:#efefef;
+      margin:30px auto;
+    }
+    .container {
+      height:200px;
+    }
+    .ltstatus {
+      height:20px;
+    }
+    .ltstatus-w {
+      padding:0px 5px 0px 26px;
+      font-size:19px;
+    }
+    .indicator {
+      position:absolute;
+      display:inline-block;
+      width:20px;
+      height:20px;
+      border-radius:50%;
+      transition:0.5s;
+    }
+    .pin-area {
+      margin-top:20px;
+      padding:10px;
+    }
+    .pin-hole {
+      margin:10px;
+      position:relative;
+      display:inline-block;
+      width:90px;
+      height:90px;
+      border-radius:5px;
+      transition:0.3s;
+      -webkit-user-select: none;
+      user-select: none;
+      background-image:url(./images/opacity-256.png);
+      background-size:35px;
+      background-repeat:no-repeat;
+      background-position:center 43px;
+      background-color:#ffffff;
+      cursor:pointer;
+    }
+    .shadow-lv0 {
+      box-shadow: 0 0px 0px rgba(0,0,0,0), 0 0px 0px rgba(0,0,0,0);
+    }
+    .shadow-lv1 {
+      box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+    }
+    .shadow-lv2 {
+      box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
+    }
+    .shadow-lv3 {
+      box-shadow: 0 10px 20px rgba(0,0,0,0.19), 0 6px 6px rgba(0,0,0,0.23)
+    }
+    .pinmode {
+      position:absolute;
+      left:27px; top:43px;
+      font-size:1.8em:
+    }
+    .hole-number {
+      position:absolute;
+      padding:10px;
+      right:0px;
+      font-size:1.2em;
+      font-weight:bold;
+      transition:0.3s;
+    }
+    .lt-button {
+      width:200px;
+      border-radius:5px;
+      margin:0px auto;
+      margin-top:20px;
+      text-align:center;
+      padding:10px 0px;
+      font-size:1.2em;
+      background-color:#aaa;
+      color:#ffffff;
+      transition:0.3s;
+      cursor:pointer;
+    }
+    .bgcolor-red {
+      background-color:#f44336;
+      opacity:0.15;
+    }
+    .bgcolor-green {
+      background-color:#0f9d58;
+    }
+    </style>
+  </head>
+  <body>
+    <link rel="import" href="./bower_components/x-webmidi/x-webmidirequestaccess.html">
+    <link rel="import" href="./web-arduino.html">
+    <web-arduino id="arduino" 
+                 pinmode='{
+                   "analog":[null, null,  null, null], 
+                   "digital":[null, null, null, null, null, null, null, null, null, null, null, null, null, null]
+                 }' hidden></web-arduino>
+
+    <div class="frame">
+      <div class="ltstatus"><div id="status-ml" class="indicator bgcolor-red"></div> <span class="ltstatus-w">Arduino Connection</span></div>
+      <div class="container">
+        <div class="pin-area">
+          <div class="pin-hole shadow-lv3" id="pin13"><span class="hole-number">13</span><span id="pm13" class="pinmode"></span></div>
+          <div class="pin-hole shadow-lv3" id="pin12"><span class="hole-number">12</span><span id="pm12" class="pinmode"></span></div>
+          <div class="pin-hole shadow-lv3" id="pin11"><span class="hole-number">11</span><span id="pm11" class="pinmode"></span></div>
+          <div class="pin-hole shadow-lv3" id="pin10"><span class="hole-number">10</span><span id="pm10" class="pinmode"></span></div>
+          <div class="pin-hole shadow-lv3" id="pin9"><span class="hole-number">9</span><span id="pm9" class="pinmode"></span></div>
+          <div class="pin-hole shadow-lv3" id="pin8"><span class="hole-number">8</span><span id="pm8" class="pinmode"></span></div>
+          <div class="pin-hole shadow-lv3" id="pin7"><span class="hole-number">7</span><span id="pm7" class="pinmode"></span></div>
+          <div class="pin-hole shadow-lv3" id="pin6"><span class="hole-number">6</span><span id="pm6" class="pinmode"></span></div>
+          <div class="pin-hole shadow-lv3" id="pin5"><span class="hole-number">5</span><span id="pm5" class="pinmode"></span></div>
+          <div class="pin-hole shadow-lv3" id="pin4"><span class="hole-number">4</span><span id="pm4" class="pinmode"></span></div>
+          <div class="pin-hole shadow-lv3" id="pin3"><span class="hole-number">3</span><span id="pm3" class="pinmode"></span></div>
+          <div class="pin-hole shadow-lv3" id="pin2"><span class="hole-number">2</span><span id="pm2" class="pinmode"></span></div>
+        </div>
+        <div class="lt-button shadow-lv3" id="lt-button">Lチカ ON</div>
+      </div>
+    </div>
+
+    <script>
+    var ard=document.getElementById("arduino");
+    var indicator=document.getElementById("status-ml");
+    var pin_mode=[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+    //var st_order=["null", "in", "out"];
+    //var st_images=["opacity-256.png", "input-256.png", "output-256.png"];
+    var st_order=["null", "out"];
+    var st_images=["opacity-256.png", "output-256.png"];
+    var lt_state=false;
+    ard.addEventListener("arduino-ready", function(event){
+        console.info("[arduino-ready]");
+    });
+    ard.addEventListener("WebArduinoReady", function(event){
+        indicator.className="indicator";
+        indicator.className+=" bgcolor-green";
+    });
+    ard.addEventListener("WebArduinoStandby", function(event){
+        indicator.className="indicator";
+        indicator.className+=" bgcolor-red";
+    });
+    ard.digitalRead=function(){};
+    ard.analogRead=function(){};
+
+    for(var i=0; i<pin_mode.length; i++) {
+        if(i>=2) {
+            document.getElementById("pin"+i).addEventListener("mousedown", mdHandler);
+            document.getElementById("pin"+i).addEventListener("mouseup", muHandler);
+
+            document.getElementById("pin"+i).addEventListener("touchstart", mdHandler);
+            document.getElementById("pin"+i).addEventListener("touchend", muHandler);
+        }
+    }
+    
+    function mdHandler(event) {
+        event.preventDefault();
+        event.stopPropagation();
+
+        var pinno=parseInt(event.target.id.replace("pin", ""));
+
+        document.getElementById("pin"+pinno).className=
+            (document.getElementById("pin"+pinno).className.replace(/shadow-lv[1-3]{1}/, "")).replace(/^\s+|\s+$/g, "");;
+        
+        pin_mode[pinno]=(pin_mode[pinno]+1)%st_order.length;
+        ard.pinMode("digital", pinno, st_order[pin_mode[pinno]]);
+        updatePinDirectionIcon(pinno, pin_mode[pinno]);
+    }
+    function muHandler(event) {
+        event.preventDefault();
+        event.stopPropagation();
+        var pinno=parseInt(event.target.id.replace("pin", ""));
+        document.getElementById("pin"+pinno).className+=" shadow-lv3";
+    }
+    function updatePinDirectionIcon(pinno, direction) {
+        event.preventDefault();
+        event.stopPropagation();
+        var elem=document.getElementById("pin"+pinno);
+        elem.style.setProperty("background-image", "url(./images/"+st_images[direction]+")");
+    }
+
+    document.getElementById("lt-button").addEventListener("mousedown", ltika);
+    document.getElementById("lt-button").addEventListener("touchstart", ltika);
+    function ltika(event) {
+        event.preventDefault();
+        event.stopPropagation();
+
+        var text="Lチカ ON";
+        if(lt_state===false) {
+            text="Lチカ OFF";
+            document.getElementById("lt-button").className=
+                (document.getElementById("lt-button").className.replace(/shadow-lv[1-3]{1}/, "")).replace(/^\s+|\s+$/g, "");
+            event.target.style.setProperty("background-color", "#2196F3");
+        } else {
+            ltbHandler(event);
+            event.target.style.setProperty("background-color", "#aaa");
+        }
+        event.target.innerHTML=text;
+        
+        var idx;
+        for(var i=0; i<st_order.length; i++) {
+            if(st_order[i]=="out") idx=i;
+        }
+
+        lt_state=!lt_state;
+        for(var i=0; i<pin_mode.length; i++) {
+            if(pin_mode[i]==idx) {
+                var state="LOW";
+                var bcolor="#ffffff";
+                var tcolor="#000000";
+                if(lt_state===true) {
+                    state="HIGH";
+                    bcolor="#2196F3";
+                    tcolor="#ffffff";
+                }
+                document.getElementById("pin"+i).style.setProperty("background-color", bcolor);
+                document.getElementById("pin"+i).style.setProperty("color", tcolor);
+                ard.digitalWrite(i, state);
+            }
+        }
+    }
+    function ltbHandler(event) {
+        event.preventDefault();
+        event.stopPropagation();
+        var pinno=parseInt(event.target.id.replace("pin", ""));
+        document.getElementById("lt-button").className+=" shadow-lv3";
+    }
+
+    </script>
+
+  </body>
+</html>
