@@ -45,7 +45,11 @@
 
     <div class="frame">
       <h2>Moco for LUFA connection Test</h2>
-      <web-arduino id="arduino" hidden></web-arduino>
+    <web-arduino id="arduino" 
+                 pinmode='{
+                   "analog":[null, null,  null, null], 
+                   "digital":[null, null, null, null, null, null, null, null, null, null, null, null, null, null]
+                 }' hidden></web-arduino>
       <div class="container">
         <div id="status-ml" class="indicator bgcolor-red"></div>
         <h3 id="status-text"></h3>
@@ -56,7 +60,7 @@
     var ard=document.getElementById("arduino");
     var indicator=document.getElementById("status-ml");
     var st=document.getElementById("status-text");
-    var disconnetedMsg="Moco for LUFA is NOT connected....";
+    var disconnetedMsg="Waiting for Moco for LUFA connection....";
     st.innerHTML=disconnetedMsg;
     ard.addEventListener("arduino-ready", function(event){
         console.info("[arduino-ready]");
@@ -71,6 +75,10 @@
         indicator.className+=" bgcolor-red";
         st.innerHTML=disconnetedMsg;
     });
+    ard.digitalRead=function(){};
+    ard.analogRead=function(){};
+
+
     </script>
 
   </body>

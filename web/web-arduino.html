@@ -190,15 +190,17 @@ Polymer({
                 fr.appendChild(imgDiv);
                 fr.appendChild(op);
 
-                //document.body.appendChild(fr);
+                document.body.appendChild(fr);
                 break;
             case "remove":
                 var rNode=document.getElementById(elemId);
                 setTimeout(function(){
-                    rNode.style.setProperty("opacity", "0.0");
-                    setTimeout(function(){
-                        rNode.parentNode.removeChild(rNode);
-                    }, 1000);
+                    if(rNode) {
+                        rNode.style.setProperty("opacity", "0.0");
+                        setTimeout(function(){
+                            rNode.parentNode.removeChild(rNode);
+                        }, 1000);
+                    }
                 }, 1000);
                 break;
         }
