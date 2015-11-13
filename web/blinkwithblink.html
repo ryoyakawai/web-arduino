@@ -107,6 +107,12 @@
     .bgcolor-green {
       background-color:#0f9d58;
     }
+    .title {
+      margin-top:20px;
+      text-align:center;
+      font-size:1.8em;
+      font-weight:bold;
+    }
     </style>
   </head>
   <body>
@@ -118,6 +124,7 @@
                    "digital":[null, null, null, null, null, null, null, null, null, null, null, null, null, null]
                  }' hidden></web-arduino>
 
+    <div class="title">Blink with Blink</div>
     <div class="frame">
       <div class="ltstatus"><div id="status-ml" class="indicator bgcolor-red"></div> <span class="ltstatus-w">Arduino Connection</span></div>
       <div class="container">
@@ -135,7 +142,7 @@
           <div class="pin-hole shadow-lv3" id="pin3"><span class="hole-number">3</span><span id="pm3" class="pinmode"></span></div>
           <div class="pin-hole shadow-lv3" id="pin2"><span class="hole-number">2</span><span id="pm2" class="pinmode"></span></div>
         </div>
-        <div class="lt-button shadow-lv3" id="lt-button">Lチカ ON</div>
+        <div class="lt-button shadow-lv3" id="lt-button">Lチカ</div>
       </div>
     </div>
 
@@ -191,11 +198,13 @@
         var pinno=parseInt(event.target.id.replace("pin", ""));
         document.getElementById("pin"+pinno).className+=" shadow-lv3";
     }
-    function updatePinDirectionIcon(pinno, direction) {
+    function updatePinDirectionIcon(pinno, direction, color) {
         event.preventDefault();
         event.stopPropagation();
         var elem=document.getElementById("pin"+pinno);
-        elem.style.setProperty("background-image", "url(./images/"+st_images[direction]+")");
+        var img=st_images[direction];
+        if(color=="white") img=st_images[direction].split(".").shift()+"-w."+st_images[direction].split(".").pop();
+        elem.style.setProperty("background-image", "url(./images/"+img+")");
     }
 
     document.getElementById("lt-button").addEventListener("mousedown", ltika);
@@ -204,9 +213,9 @@
         event.preventDefault();
         event.stopPropagation();
 
-        var text="Lチカ ON";
+        var text="Lチカ";
         if(lt_state===false) {
-            text="Lチカ OFF";
+            text="Lオフ";
             document.getElementById("lt-button").className=
                 (document.getElementById("lt-button").className.replace(/shadow-lv[1-3]{1}/, "")).replace(/^\s+|\s+$/g, "");
             event.target.style.setProperty("background-color", "#2196F3");
@@ -227,12 +236,15 @@
                 var state="LOW";
                 var bcolor="#ffffff";
                 var tcolor="#000000";
+                updatePinDirectionIcon(i, pin_mode[i], "");
                 if(lt_state===true) {
                     state="HIGH";
                     bcolor="#2196F3";
                     tcolor="#ffffff";
+                    updatePinDirectionIcon(i, pin_mode[i], "white");
                 }
                 document.getElementById("pin"+i).style.setProperty("background-color", bcolor);
+                document.getElementById("pin"+i).style.setProperty("color", tcolor);
                 document.getElementById("pin"+i).style.setProperty("color", tcolor);
                 ard.digitalWrite(i, state);
             }

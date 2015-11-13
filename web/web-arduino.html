@@ -50,7 +50,7 @@ Polymer({
         
         if(this.disable===true) this.$.arduinoin.setProperty("hidden", "hidden");
 
-        var autoSelectDeviceName="^MIDI/MOCO for LUFA$|^MocoLUFA$";
+        var autoSelectDeviceName="^MIDI/MOCO for LUFA$|^MocoLUFA$|^mi.1";
         if(this.boardname!=null && this.boardname!="") {
             autoSelectDeviceName=this.boardname+"|"+autoSelectDeviceName;
         }
